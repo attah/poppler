@@ -172,6 +172,11 @@ public:
     double getPageCropWidth(int page) { return getPage(page) ? getPage(page)->getCropWidth() : 0.0; }
     double getPageCropHeight(int page) { return getPage(page) ? getPage(page)->getCropHeight() : 0.0; }
     int getPageRotate(int page) { return getPage(page) ? getPage(page)->getRotate() : 0; }
+    void setPageRotate(int page, int rotate)
+    {
+        if (getPage(page))
+            getPage(page)->setRotate(rotate);
+    }
 
     // Get number of pages.
     int getNumPages();

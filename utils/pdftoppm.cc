@@ -84,6 +84,7 @@ static bool printOnlyOdd = false;
 static bool printOnlyEven = false;
 static bool singleFile = false;
 static bool scaleDimensionBeforeRotation = false;
+static bool portrait = false;
 static double resolution = 0.0;
 static double x_resolution = 150.0;
 static double y_resolution = 150.0;
@@ -138,6 +139,7 @@ static const ArgDesc argDesc[] = { { "-f", argInt, &firstPage, 0, "first page to
                                    { "-e", argFlag, &printOnlyEven, 0, "print only even pages" },
                                    { "-singlefile", argFlag, &singleFile, 0, "write only the first page and do not add digits" },
                                    { "-scale-dimension-before-rotation", argFlag, &scaleDimensionBeforeRotation, 0, "for rotated pdf, resize dimensions before the rotation" },
+                                   { "-portrait", argFlag, &portrait, 0, "automatically rotate pages to portrait" },
 
                                    { "-r", argFP, &resolution, 0, "resolution, in DPI (default is 150)" },
                                    { "-rx", argFP, &x_resolution, 0, "X resolution, in DPI (default is 150)" },
@@ -578,6 +580,16 @@ int main(int argc, char *argv[])
         } else {
             pg_w = doc->getPageMediaWidth(pg);
             pg_h = doc->getPageMediaHeight(pg);
+        }
+
+        if (portrait) {
+            // Make sure H and W are swapped for scaling calculation,
+            // if rotation will be applied
+            scaleDimensionBeforeRotation = true;
+
+            if (needToRotate(doc->getPageRotate(pg)) != (pg_w > pg_h)) {
+                doc->setPageRotate(pg, (doc->getPageRotate(pg) + 90) % 360);
+            }
         }
 
         if (scaleDimensionBeforeRotation && needToRotate(doc->getPageRotate(pg)))
